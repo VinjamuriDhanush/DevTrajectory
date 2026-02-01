@@ -1,6 +1,6 @@
 # DevTrajectory
 
-A 30-day placement preparation tracker with:
+A 30-day preparation tracker with:
 - Daily task checklist
 - Visual progress graph
 - Mobile-friendly UI
