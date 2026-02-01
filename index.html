@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30-Day Job Prep Tracker</title>
+
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    background: #0f172a;
+    color: #e5e7eb;
+    margin: 0;
+    padding: 12px;
+  }
+
+  h1 {
+    text-align: center;
+    color: #38bdf8;
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+  }
+
+  .layout {
+    display: flex;
+    gap: 12px;
+  }
+
+  .table-container {
+    flex: 3;
+    overflow-x: auto;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 600px;
+  }
+
+  th, td {
+    border: 1px solid #334155;
+    padding: 6px;
+    text-align: center;
+    font-size: 0.85rem;
+  }
+
+  th {
+    background: #1e293b;
+    position: sticky;
+    top: 0;
+  }
+
+  tr:nth-child(even) {
+    background: #020617;
+  }
+
+  input[type="checkbox"] {
+    transform: scale(1.2);
+  }
+
+  .chart-container {
+    flex: 1;
+    background: #020617;
+    border-radius: 10px;
+    padding: 10px;
+    height: fit-content;
+    position: sticky;
+    top: 12px;
+  }
+
+  canvas {
+    width: 100%;
+    height: 220px;
+  }
+
+  @media (max-width: 768px) {
+    .layout {
+      flex-direction: column;
+    }
+
+    table {
+      min-width: 100%;
+    }
+
+    canvas {
+      height: 180px;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<h1>📊 30-Day Placement Prep Tracker</h1>
+
+<div class="layout">
+
+  <!-- TABLE -->
+  <div class="table-container">
+    <table id="tracker">
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>DSA</th>
+          <th>Project</th>
+          <th>Core CS</th>
+          <th>Cyber</th>
+          <th>GitHub</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- GRAPH -->
+  <div class="chart-container">
+    <h3 style="text-align:center;color:#38bdf8;">Progress</h3>
+    <canvas id="progressChart"></canvas>
+  </div>
+
+</div>
+
+<script>
+const DAYS = 30;
+const TASKS = 5;
+const tbody = document.querySelector("tbody");
+
+let data = JSON.parse(localStorage.getItem("prepTracker"))
+  || Array(DAYS).fill().map(() => Array(TASKS).fill(false));
+
+// Build table
+for (let d = 0; d < DAYS; d++) {
+  const row = document.createElement("tr");
+  row.innerHTML = `<td>Day ${d + 1}</td>`;
+  for (let t = 0; t < TASKS; t++) {
+    const td = document.createElement("td");
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = data[d][t];
+    cb.onchange = () => {
+      data[d][t] = cb.checked;
+      localStorage.setItem("prepTracker", JSON.stringify(data));
+      drawChart();
+    };
+    td.appendChild(cb);
+    row.appendChild(td);
+  }
+  tbody.appendChild(row);
+}
+
+// Graph
+const canvas = document.getElementById("progressChart");
+const ctx = canvas.getContext("2d");
+
+function drawChart() {
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const completed = data.map(day => day.filter(Boolean).length);
+  const max = TASKS;
+  const w = canvas.width / (DAYS - 1);
+
+  ctx.strokeStyle = "#38bdf8";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+
+  completed.forEach((val, i) => {
+    const x = i * w;
+    const y = canvas.height - (val / max) * canvas.height;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  ctx.fillStyle = "#38bdf8";
+  completed.forEach((val, i) => {
+    const x = i * w;
+    const y = canvas.height - (val / max) * canvas.height;
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+drawChart();
+</script>
+
+</body>
+</html>
