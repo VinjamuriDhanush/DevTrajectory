@@ -7,4 +7,4 @@ A 30-day preparation tracker with:
 - Local storage persistence
 
 Built with HTML, CSS, and JavaScript.
-
+https://devtrajectory.netlify.app/ 
